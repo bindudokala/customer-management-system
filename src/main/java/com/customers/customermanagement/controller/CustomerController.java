@@ -24,7 +24,7 @@ public class CustomerController {
 
     @PostMapping
     public ResponseEntity<CustomerDTO> createCustomer(@Valid @RequestBody CustomerDTO customerDTO) {
-        // CustomerDTO is passed, but it will be converted to Customer in the service layer
+        // CustomerDTO is passed and will be converted to Customer in the service layer
         return new ResponseEntity<>(customerService.createCustomer(customerDTO), HttpStatus.CREATED);
     }
 
