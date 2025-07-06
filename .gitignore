@@ -4,6 +4,8 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+.env
+
 ### STS ###
 .apt_generated
 .classpath
@@ -14,7 +16,6 @@ target/
 .sts4-cache
 
 ### IntelliJ IDEA ###
-.DS_Store
 .idea
 *.iws
 *.iml
