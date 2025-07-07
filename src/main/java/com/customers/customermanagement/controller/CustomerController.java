@@ -49,8 +49,8 @@ public class CustomerController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCustomer(@PathVariable UUID id) {
+    public ResponseEntity<String> deleteCustomer(@PathVariable UUID id) {
         // Delete customer by id and return appropriate response
-        return customerService.deleteCustomer(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+        return customerService.deleteCustomer(id) ? ResponseEntity.ok("Successfully deleted the customer with ID: " + id) : ResponseEntity.notFound().build();
     }
 }

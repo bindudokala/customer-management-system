@@ -86,9 +86,9 @@ class CustomerControllerTest {
         UUID id = UUID.randomUUID();
         when(customerService.deleteCustomer(id)).thenReturn(true);
 
-        ResponseEntity<Void> response = controller.deleteCustomer(id);
+        ResponseEntity<String> response = controller.deleteCustomer(id);
 
-        assertEquals(204, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCodeValue());
     }
 
     @Test
@@ -96,7 +96,7 @@ class CustomerControllerTest {
         UUID id = UUID.randomUUID();
         when(customerService.deleteCustomer(id)).thenReturn(false);
 
-        ResponseEntity<Void> response = controller.deleteCustomer(id);
+        ResponseEntity<String> response = controller.deleteCustomer(id);
 
         assertEquals(404, response.getStatusCodeValue());
     }

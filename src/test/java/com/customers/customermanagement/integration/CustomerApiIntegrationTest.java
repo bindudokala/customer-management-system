@@ -85,7 +85,8 @@ class CustomerApiIntegrationTest {
 
     @Test
     void shouldDeleteCustomer() throws Exception {
-        mockMvc.perform(delete("/api/customers/" + testCustomer.getId()))
-                .andExpect(status().isNoContent());
+        mockMvc.perform(delete("/api/customers/{id}", testCustomer.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Successfully deleted")));
     }
 }
