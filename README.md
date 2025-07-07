@@ -46,7 +46,7 @@ All responses are returned in JSON format with appropriate status codes (e.g., `
 We use **H2 in file mode** (`jdbc:h2:file`) to persist customer data between application restarts.
 
 - Console available at: `http://localhost:8080/h2-console`
-- JDBC URL: `jdbc:h2:file:./data/testdb`
+- JDBC URL: `jdbc:h2:file:./data/customer-db`
 - Platform: `H2Dialect`
 
 ---
@@ -126,8 +126,9 @@ The application is fully containerized using Docker. This makes it portable and 
 
 ### 🐳 Dockerfile Used
 ```dockerfile
-FROM openjdk:17-jdk-slim
-COPY ./target/customer-management-system.jar customer-management-system.jar
+FROM eclipse-temurin:21
+WORKDIR /home
+COPY ./target/customer-management-system-3.5.3.jar customer-management-system.jar
 ENTRYPOINT ["java", "-jar", "customer-management-system.jar"]
 ```
 ⚙️ Required Inputs
@@ -146,11 +147,98 @@ These are typically provided using a .env file during development or passed expl
 - export $(cat .env | xargs)
 - docker build -t customer-management-system .
 - docker run -d -p 8080:8080 --name customer-app customer-management-system
+- docker run -d -p 8080:8080 --name customer-app -e DB_USERNAME=your-username -e DB_PASSWORD=your-password customer-management-system
 ```
 
 ---
 
+## ☘️ Step 5: Kubernetes Deployment
 
+### Setup
+
+This project is deployed to a **local Kubernetes cluster** using the built-in Kubernetes integration provided by **Docker Desktop**.
+
+### 🧭 Prerequisites
+
+- Docker Desktop installed with Kubernetes enabled.
+- `kubectl` installed and configured.
+- Docker image already built: `customer-management-system`.
+
+---
+
+### 🚀 Kubernetes Deployment Instructions
+
+### ✅ Ensure Kubernetes Context is Set
+
+- Before applying manifests, make sure `kubectl` is connected to the local cluster:
+
+```bash
+- kubectl config current-context
+```
+
+### 📦 **Deploy the Application**
+
+```bash
+- kubectl apply -f deployment.yaml
+```
+### 🔍 **Verify Deployment**
+
+Check the running pods, services and deployments:
+
+```bash
+- kubectl get pods
+- kubectl get deployments
+- kubectl get services
+```
+
+### 🌐 **Access the Application**
+
+To access your application, open a browser and visit:
+
+```arduino
+http://localhost:30000
+```
+This maps to the NodePort exposed by the Kubernetes service.
+
+### 🧹 **Clean Up**
+
+If needed, delete the deployment using:
+
+```bash
+- kubectl delete -f deployment.yaml
+```
+
+## ⚙️ Step 6: CI/CD Pipeline
+
+### Approach
+
+* CI/CD defined via **GitHub Actions** (alternatively usable with Jenkins or GitLab CI)
+* Pipeline includes:
+
+  * Code compilation and testing
+  * Docker image build and push (GitHub Container Registry)
+  * Lint checks
+
+> CI/CD config placed in `.github/workflows/ci-cd.yaml`
+
+---
+
+## 🔗 Step 7: CLI App Integration
+
+A lightweight **Java CLI client** was built to consume the REST API using `HttpURLConnection` and Jackson for JSON parsing.
+
+### Features
+
+* Create, update, fetch, delete customers from terminal
+* Command-based interface (input via scanner)
+
+### Usage
+
+```bash
+- java -jar customer-cli-client.jar
+```
+
+---
 
 ## 🔒 Validation & Error Handling
 
@@ -190,18 +278,9 @@ src/
 
 ## 🛠️ Tech Stack
 
-* Java 17, Spring Boot 3.5
+* Java 21, Spring Boot 3.5
 * H2 Database
 * Docker, Kubernetes (Minikube)
 * JUnit 5, Mockito
 * Prometheus, Spring Actuator
 * CI/CD via GitHub Actions
-
----
-
-## 💡 Future Improvements
-
-* Swagger/OpenAPI documentation
-* Integration with PostgreSQL for production
-* Role-based security (Spring Security + OAuth)
-* Deployment with Helm or ArgoCD
