@@ -28,15 +28,7 @@ jobs:
         run: mvn clean package -DskipTests
 
       - name: Run the unit tests
-        run: mvn --batch-mode -Dmaven.test.failure.ignore=true test
-      - name: Report test results
-        if: always()
-        uses: dorny/test-reporter@v1
-        with:
-          name: Maven Tests
-          path: target/surefire-reports/*.xml
-          reporter: java-junit
-          fail-on-error: true
+        run: mvn test
 
       - name: Build and push the image
         run: |
