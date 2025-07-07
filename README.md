@@ -88,13 +88,13 @@ Spring Boot does not automatically load .env files. You must manually export the
 ```
 
 ⚙️ CI/CD Automation Potential
-These tests are safe to run in CI/CD pipelines and can be triggered during the test phase in GitHub Actions, GitLab CI, Jenkins, etc.
+These tests are safe to run in CI/CD pipelines and can be triggered during the test phase in GitHub Actions.
 
 Example Maven stage in a CI pipeline:
 
 ```bash
-- name: Run Tests
-  run: ./mvnw test
+- name: Run the unit tests
+  run: mvn test
 ```
 
 ---
@@ -210,17 +210,41 @@ If needed, delete the deployment using:
 
 ## ⚙️ Step 6: CI/CD Pipeline
 
-### Approach
+## 📦 Trigger
+Pipeline runs on every `push` to `main`.
 
-* CI/CD defined via **GitHub Actions** (alternatively usable with Jenkins or GitLab CI)
-* Pipeline includes:
+## 🔁 Pipeline Stages
 
-  * Code compilation and testing
-  * Docker image build and push (GitHub Container Registry)
-  * Lint checks
+### 1. **Checkout Repository**  
+- Clones the latest code.
+
+### 2. **Set Up Java**  
+- Configures JDK 21 using `temurin`.
+
+### 3. **Set Environment Variables**  
+- Loads DB credentials and other config via GitHub Secrets.
+
+### 4. **Build with Maven**  
+- Runs `mvn clean package -DskipTests`
+
+### 5. **Run Unit Tests**  
+- Runs `mvn test` to execute all unit and integration tests.
+
+### 6. **Docker Build & Push**
+  - Logs into GitHub Container Registry
+  - Builds Docker image
+  - Pushes image with tag to `ghcr.io`
+
+### 7. **Kubernetes Deploy**
+  - Sets up `kubectl` and KUBECONFIG
+  - Deploys using `deployment.yaml` (can be disabled for local testing)
 
 > CI/CD config placed in `.github/workflows/ci-cd.yaml`
 
+## 🔒 Secrets Used
+- `CUSTOMER_ACCESS_TOKEN`
+- `DB_USERNAME` / `DB_PASSWORD`
+- `KUBE_CONFIG_DATA` (optional)
 ---
 
 ## 🔗 Step 7: CLI App Integration
@@ -261,17 +285,31 @@ A lightweight **Java CLI client** was built to consume the REST API using `HttpU
 src/
 ├── main/
 │   ├── java/
-│   │   └── com.customers/
+│   │   └── com/customers/customermanagement/
 │   │       ├── controller/
 │   │       ├── service/
 │   │       ├── entity/
 │   │       ├── dto/
-│   │       └── exception/
+│   │       ├── exception/
+│   │       ├── repository/
+│   │       └── CustomerManagementSystemApplication.java
 │   └── resources/
-│       ├── application.properties
-│       └── Dockerfile
+│       ├── static/
+│       ├── templates/
+│       └── application.properties
 ├── test/
-│   └── java/ (unit & integration tests)
+│   └── java/
+│       └── com/customers/customermanagement/
+│           ├── unit/
+│           ├── integration/
+│           └── CustomerManagementSystemApplicationTests.java
+├── data/                   
+├── .env
+├── .gitignore
+├── Dockerfile
+├── deployment.yaml
+├── pom.xml
+└── README.md
 ```
 
 ---
